@@ -28,7 +28,7 @@ class Citation(BaseModel):
     author: str | None = None
     subject: str | None = None
     creation_date: str | None = None
-    extraction_notes: str | None = None
+    extraction_notes: list[str] | str | None = None
     snippet: str | None = None
 
 
