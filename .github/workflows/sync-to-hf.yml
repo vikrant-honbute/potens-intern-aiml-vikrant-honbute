@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Sync to Hugging Face Space
         env:
@@ -23,16 +23,17 @@ jobs:
 
           SPACE_REPO_URL="${HF_SPACE_REPO:-https://huggingface.co/spaces/Vikrant-Honbute/schemesense-ai}"
           WORKDIR="/tmp/hf-space-sync"
+          AUTH_URL="https://user:${HF_TOKEN}@${SPACE_REPO_URL#https://}"
 
-          git clone "https://user:${HF_TOKEN}@${SPACE_REPO_URL#https://}" "${WORKDIR}"
+          git clone --depth 1 "${AUTH_URL}" "${WORKDIR}"
           rsync -a --delete --exclude '.git' ./ "${WORKDIR}/"
 
           cd "${WORKDIR}"
-          if git diff --quiet && git diff --cached --quiet; then
+          if git status --short | grep -q .; then
+            git add -A
+            git commit -m "sync: update space from github"
+            git push origin HEAD:main
+          else
             echo "No changes to sync."
             exit 0
           fi
-
-          git add -A
-          git commit -m "sync: update space from github"
-          git push origin main
