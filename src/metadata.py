@@ -129,7 +129,11 @@ class PageMetadata:
     extraction_notes: tuple[str, ...]
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        data = asdict(self)
+        # Convert tuple to list for clean JSON serialization and FAISS metadata compatibility.
+        if isinstance(data.get("extraction_notes"), tuple):
+            data["extraction_notes"] = list(data["extraction_notes"])
+        return data
 
 
 @dataclass(slots=True)
