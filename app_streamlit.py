@@ -6,9 +6,66 @@ import streamlit as st
 
 API_BASE_URL = "http://localhost:8000"
 
-st.set_page_config(page_title="SchemeSense AI", layout="wide")
-st.title("🏛️ SchemeSense AI")
-st.caption("Grounded Q&A and contradiction checks for Indian government scheme documents.")
+st.set_page_config(page_title="SchemeSense AI", layout="wide", initial_sidebar_state="collapsed")
+
+# Inject custom CSS for premium UI
+st.markdown("""
+<style>
+    /* Hide Streamlit default header and footer */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
+    /* Gradient Title */
+    .gradient-text {
+        background: -webkit-linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    /* Improve subheaders */
+    h3 {
+        color: #4ECDC4;
+        font-weight: 600;
+    }
+    
+    /* Style forms for a card-like appearance */
+    [data-testid="stForm"] {
+        background-color: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Make buttons slightly more rounded and prominent */
+    .stButton > button {
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(78, 205, 196, 0.4);
+    }
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<h1 style="font-weight:800; font-size:3rem; padding-bottom:0.5rem;">🏛️ <span class="gradient-text">SchemeSense AI</span></h1>', unsafe_allow_html=True)
+st.markdown("**Grounded Q&A and contradiction checks for Indian government scheme documents.**")
+
+st.markdown("""
+<div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; margin-bottom: 5px;">
+    <span style="background: rgba(78, 205, 196, 0.15); color: #4ECDC4; border: 1px solid rgba(78, 205, 196, 0.4); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">🌾 PM-KISAN</span>
+    <span style="background: rgba(255, 107, 107, 0.15); color: #FF6B6B; border: 1px solid rgba(255, 107, 107, 0.4); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">🛠️ PM Vishwakarma</span>
+    <span style="background: rgba(69, 183, 209, 0.15); color: #45B7D1; border: 1px solid rgba(69, 183, 209, 0.4); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">🏥 PM-JAY (Ayushman Bharat)</span>
+    <span style="background: rgba(167, 139, 250, 0.15); color: #A78BFA; border: 1px solid rgba(167, 139, 250, 0.4); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">🩺 PM Arogya Mitra</span>
+    <span style="background: rgba(249, 168, 37, 0.15); color: #F9A825; border: 1px solid rgba(249, 168, 37, 0.4); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">💼 PM Mudra Yojana</span>
+    <span style="background: rgba(102, 187, 106, 0.15); color: #66BB6A; border: 1px solid rgba(102, 187, 106, 0.4); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">🚀 Stand Up India</span>
+</div>
+""", unsafe_allow_html=True)
+
+st.divider()
 
 
 def post_json(url: str, payload: dict) -> dict:
