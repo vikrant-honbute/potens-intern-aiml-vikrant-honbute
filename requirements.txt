@@ -4,6 +4,7 @@ streamlit
 faiss-cpu
 langchain
 langchain-community
+langchain-classic
 langchain-google-genai
 sentence-transformers
 rank-bm25
@@ -12,3 +13,4 @@ langdetect
 python-dotenv
 numpy
 requests
+streamlit
