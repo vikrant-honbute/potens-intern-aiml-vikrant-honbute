@@ -24,6 +24,11 @@ class Citation(BaseModel):
     source_file: str | None = None
     document_page_number: int | None = None
     chunk_id: str | None = None
+    title: str | None = None
+    author: str | None = None
+    subject: str | None = None
+    creation_date: str | None = None
+    extraction_notes: str | None = None
     snippet: str | None = None
 
 
@@ -92,6 +97,11 @@ def ask(request: AskRequest):
             source_file=doc.metadata.get("source_file"),
             document_page_number=doc.metadata.get("document_page_number"),
             chunk_id=doc.metadata.get("chunk_id"),
+            title=doc.metadata.get("title"),
+            author=doc.metadata.get("author"),
+            subject=doc.metadata.get("subject"),
+            creation_date=doc.metadata.get("creation_date"),
+            extraction_notes=doc.metadata.get("extraction_notes"),
             snippet=doc.page_content,
         )
         for doc in documents[:4]
