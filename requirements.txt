@@ -6,6 +6,7 @@ langchain
 langchain-community
 langchain-classic
 langchain-google-genai
+langchain-huggingface
 sentence-transformers
 rank-bm25
 pymupdf
@@ -13,4 +14,3 @@ langdetect
 python-dotenv
 numpy
 requests
-streamlit

@@ -1,5 +1,13 @@
+import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# langchain-google-genai expects GOOGLE_API_KEY; support GEMINI_API_KEY as an alias.
+if not os.environ.get("GOOGLE_API_KEY") and os.environ.get("GEMINI_API_KEY"):
+    os.environ["GOOGLE_API_KEY"] = os.environ["GEMINI_API_KEY"]
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_CORPUS_DIR = ROOT_DIR / "data" / "pdfs"
