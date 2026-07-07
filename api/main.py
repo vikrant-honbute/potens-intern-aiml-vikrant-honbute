@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from src.config import DEFAULT_ARTIFACT_DIR, DEFAULT_CHUNK_OVERLAP, DEFAULT_CHUNK_SIZE, DEFAULT_CORPUS_DIR, DEFAULT_GEMINI_MODEL
+from src.ingest import discover_pdf_files
 from src.llm import answer_question, build_chat_model
 from src.rerank import build_reranked_retriever
 from src.translate import detect_language, translate_answer_from_english, translate_query_to_english
@@ -66,6 +67,16 @@ def health():
     return {"status": "ok"}
 
 
+@app.get("/documents")
+def list_documents():
+    """Return the list of available PDF document names (without extension)."""
+    pdf_files = discover_pdf_files(DEFAULT_CORPUS_DIR)
+    return [
+        {"filename": p.name, "stem": p.stem}
+        for p in pdf_files
+    ]
+
+
 @app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest):
     detected_language = detect_language(request.query)
@@ -81,7 +92,7 @@ def ask(request: AskRequest):
             source_file=doc.metadata.get("source_file"),
             document_page_number=doc.metadata.get("document_page_number"),
             chunk_id=doc.metadata.get("chunk_id"),
-            snippet=doc.page_content[:300],
+            snippet=doc.page_content,
         )
         for doc in documents[:4]
     ]
