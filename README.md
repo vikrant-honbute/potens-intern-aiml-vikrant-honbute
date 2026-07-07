@@ -1,3 +1,13 @@
+---
+title: SchemeSense AI
+emoji: 🚀
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_file: app_streamlit.py
+pinned: false
+---
+
 # SchemeSense AI — Document Q&A with Citations
 
 A Retrieval-Augmented Generation (RAG) system for Indian government scheme documents that provides grounded answers with citations and contradiction detection across documents.

@@ -12,10 +12,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Push to Hugging Face Space
+      - name: Sync to Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_SPACE_REPO: ${{ secrets.HF_SPACE_REPO }}
         run: |
-          git remote add hf https://user:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_REPO}
-          git push hf main
+          set -euo pipefail
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          SPACE_REPO_URL="${HF_SPACE_REPO:-https://huggingface.co/spaces/Vikrant-Honbute/schemesense-ai}"
+          WORKDIR="/tmp/hf-space-sync"
+
+          git clone "https://user:${HF_TOKEN}@${SPACE_REPO_URL#https://}" "${WORKDIR}"
+          rsync -a --delete --exclude '.git' ./ "${WORKDIR}/"
+
+          cd "${WORKDIR}"
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to sync."
+            exit 0
+          fi
+
+          git add -A
+          git commit -m "sync: update space from github"
+          git push origin main
