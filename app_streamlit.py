@@ -76,7 +76,10 @@ st.divider()
 
 def post_json(url: str, payload: dict) -> dict:
     response = requests.post(url, json=payload, timeout=300)
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        raise Exception(f"API Error {response.status_code}: {response.text}") from e
     return response.json()
 
 

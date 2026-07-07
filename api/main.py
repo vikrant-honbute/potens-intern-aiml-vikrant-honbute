@@ -84,29 +84,36 @@ def list_documents():
 
 @app.post("/ask", response_model=AskResponse)
 def ask(request: AskRequest):
-    detected_language = detect_language(request.query)
-    language, translated_query = translate_query_to_english(request.query, model_name=DEFAULT_GEMINI_MODEL)
-    retriever = _retriever()
-    documents = retriever.invoke(translated_query)
-    if not documents:
-        raise HTTPException(status_code=404, detail="No supporting context found in the documents.")
-    answer_en = answer_question(_chat_model(), translated_query, documents)
-    answer = translate_answer_from_english(answer_en, detected_language, model_name=DEFAULT_GEMINI_MODEL) if detected_language != "en" else answer_en
-    citations = [
-        Citation(
-            source_file=doc.metadata.get("source_file"),
-            document_page_number=doc.metadata.get("document_page_number"),
-            chunk_id=doc.metadata.get("chunk_id"),
-            title=doc.metadata.get("title"),
-            author=doc.metadata.get("author"),
-            subject=doc.metadata.get("subject"),
-            creation_date=doc.metadata.get("creation_date"),
-            extraction_notes=doc.metadata.get("extraction_notes"),
-            snippet=doc.page_content,
-        )
-        for doc in documents[:4]
-    ]
-    return AskResponse(answer=answer, detected_language=detected_language, translated_query=translated_query if detected_language != "en" else None, citations=citations)
+    try:
+        detected_language = detect_language(request.query)
+        language, translated_query = translate_query_to_english(request.query, model_name=DEFAULT_GEMINI_MODEL)
+        retriever = _retriever()
+        documents = retriever.invoke(translated_query)
+        if not documents:
+            raise HTTPException(status_code=404, detail="No supporting context found in the documents.")
+        answer_en = answer_question(_chat_model(), translated_query, documents)
+        answer = translate_answer_from_english(answer_en, detected_language, model_name=DEFAULT_GEMINI_MODEL) if detected_language != "en" else answer_en
+        citations = [
+            Citation(
+                source_file=doc.metadata.get("source_file"),
+                document_page_number=doc.metadata.get("document_page_number"),
+                chunk_id=doc.metadata.get("chunk_id"),
+                title=doc.metadata.get("title"),
+                author=doc.metadata.get("author"),
+                subject=doc.metadata.get("subject"),
+                creation_date=doc.metadata.get("creation_date"),
+                extraction_notes=doc.metadata.get("extraction_notes"),
+                snippet=doc.page_content,
+            )
+            for doc in documents[:4]
+        ]
+        return AskResponse(answer=answer, detected_language=detected_language, translated_query=translated_query if detected_language != "en" else None, citations=citations)
+    except Exception as e:
+        import traceback
+        if isinstance(e, HTTPException):
+            raise e
+        err = traceback.format_exc()
+        raise HTTPException(status_code=500, detail=f"Backend Error: {str(e)}\n\nTraceback:\n{err}")
 
 
 @app.post("/contradict", response_model=ContradictResponse)
