@@ -9,6 +9,21 @@ from typing import Any
 _PAGE_LABEL_RE = re.compile(r"page\s+(\d+)\s+of\s+(\d+)", re.IGNORECASE)
 
 
+def _is_generic_title(title: str) -> bool:
+    normalized = title.strip().lower()
+    if not normalized:
+        return True
+    if normalized.startswith("microsoft word -"):
+        return True
+    if normalized.startswith("untitled"):
+        return True
+    if " page " in f" {normalized} ":
+        return True
+    if len(normalized) > 140:
+        return True
+    return False
+
+
 def normalize_whitespace(text: str) -> str:
     text = text.replace("\u00a0", " ").replace("\x00", "")
     text = text.replace("\r\n", "\n").replace("\r", "\n")
@@ -19,14 +34,14 @@ def normalize_whitespace(text: str) -> str:
 
 def guess_document_title(source_path: Path, loader_metadata: dict[str, Any]) -> str:
     title = loader_metadata.get("title")
-    if isinstance(title, str) and title.strip():
+    if isinstance(title, str) and title.strip() and not _is_generic_title(title):
         return title.strip()
     return source_path.stem
 
 
 def guess_document_title_from_text(text: str, source_path: Path, loader_metadata: dict[str, Any]) -> str:
     title = loader_metadata.get("title")
-    if isinstance(title, str) and title.strip():
+    if isinstance(title, str) and title.strip() and not _is_generic_title(title):
         return title.strip()
 
     lines = [line.strip() for line in text.splitlines() if line.strip()]
@@ -40,6 +55,8 @@ def guess_document_title_from_text(text: str, source_path: Path, loader_metadata
             continue
         if len(line) > 90:
             break
+        if len(re.sub(r"[^A-Za-z]", "", line)) < 4:
+            continue
         if line.isupper() and title_lines:
             break
 
@@ -81,6 +98,8 @@ def guess_section_hint(text: str) -> str | None:
             break
         if len(candidate) > 80:
             break
+        if len(re.sub(r"[^A-Za-z]", "", candidate)) < 4:
+            continue
         if not re.search(r"[A-Za-z]", candidate):
             continue
         if re.fullmatch(r"(?:government of india|national health authority|version.*|disclaimer.*)", lower_candidate):
