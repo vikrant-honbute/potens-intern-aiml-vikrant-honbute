@@ -52,7 +52,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown('<h1 style="font-weight:800; font-size:3rem; padding-bottom:0.5rem;">🏛️ <span class="gradient-text">SchemeSense AI</span></h1>', unsafe_allow_html=True)
-st.markdown("**Grounded Q&A and contradiction checks for Indian government scheme documents.**")
+st.markdown("""
+**Ask questions about Indian Government Schemes using official documents with verifiable citations.**
+
+<div style="font-size: 0.95rem; color: #4ECDC4; margin-top: 5px;">
+✓ Grounded Answers &nbsp;&nbsp; ✓ Page Citations &nbsp;&nbsp; ✓ Hindi Support &nbsp;&nbsp; ✓ Hallucination Safe
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; margin-bottom: 5px;">
@@ -101,6 +107,23 @@ with ask_tab:
         )
         ask_submitted = st.form_submit_button("Ask", type="primary")
 
+    with st.expander("💡 Example Questions"):
+        st.markdown("""
+        - Who is eligible for PM Vishwakarma?
+        - पीएम-किसान योजना का लाभ किन किसानों को मिलता है?
+        - What are the major benefits provided under PM Vishwakarma?
+        - पीएम विश्वकर्मा योजना के क्या लाभ हैं?
+        - What documents are required for PM-KISAN?
+        - पीएम विश्वकर्मा योजना के तहत कितना ऋण मिलता है?
+        - Does Ayushman Bharat cover cancer treatment?
+        - प्रधानमंत्री मुद्रा योजना के अंतर्गत अधिकतम कितना ऋण मिल सकता है?
+        - Who is eligible to apply for a MUDRA loan?
+        - What is the role of a Pradhan Mantri Arogya Mitra during beneficiary verification?
+        - What is the maximum loan amount available under the MUDRA Loan Scheme?
+        - What training is provided under PM Vishwakarma?
+        """)
+
+
     if ask_submitted:
         if query.strip():
             with st.spinner("Searching documents and generating answer..."):
@@ -121,12 +144,25 @@ with ask_tab:
                         source = citation.get("source_file", "Unknown")
                         page = citation.get("document_page_number", "?")
                         chunk_id = citation.get("chunk_id", "")
+                        title = citation.get("title")
+                        author = citation.get("author")
+                        subject = citation.get("subject")
+                        creation_date = citation.get("creation_date")
+                        notes = citation.get("extraction_notes")
                         snippet = citation.get("snippet", "")
 
-                        with st.expander(
-                            f"📄 {source} | Page {page} | {chunk_id}",
-                            expanded=(i == 1),
-                        ):
+                        with st.expander(f"📄 {source} | Page {page}", expanded=(i == 1)):
+                            meta_md = ""
+                            if title: meta_md += f"**Title:** {title}  \n"
+                            if subject: meta_md += f"**Subject:** {subject}  \n"
+                            if author: meta_md += f"**Author:** {author}  \n"
+                            if creation_date: meta_md += f"**Date:** {creation_date}  \n"
+                            if notes: meta_md += f"**Notes:** {notes}  \n"
+                            
+                            if meta_md:
+                                st.info(meta_md)
+                            
+                            st.markdown(f"**Chunk ID:** `{chunk_id}`")
                             st.markdown(snippet)
 
                 except requests.exceptions.ConnectionError:
