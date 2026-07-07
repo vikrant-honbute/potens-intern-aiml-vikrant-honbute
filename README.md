@@ -54,12 +54,12 @@ Government scheme documents contain dense legalese with interconnected clauses. 
 
 ### Implementation Details
 
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| `chunk_size` | 1200 chars | ~200-250 words — large enough to hold a complete policy clause but small enough for precise retrieval |
-| `chunk_overlap` | 150 chars | ~1-2 sentences of overlap to prevent information loss at chunk boundaries |
-| Splitter | `RecursiveCharacterTextSplitter` | Tries `\n\n` → `\n` → `. ` → ` ` → `""` in order, preserving natural document structure |
-| `add_start_index` | `True` | Tracks character offset for precise citation back to original page |
+| Parameter         | Value                            | Rationale                                                                                             |
+| ----------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `chunk_size`      | 1200 chars                       | ~200-250 words — large enough to hold a complete policy clause but small enough for precise retrieval |
+| `chunk_overlap`   | 150 chars                        | ~1-2 sentences of overlap to prevent information loss at chunk boundaries                             |
+| Splitter          | `RecursiveCharacterTextSplitter` | Tries `\n\n` → `\n` → `. ` → ` ` → `""` in order, preserving natural document structure               |
+| `add_start_index` | `True`                           | Tracks character offset for precise citation back to original page                                    |
 
 ### Chunking Pipeline
 
@@ -79,28 +79,31 @@ Government scheme documents contain dense legalese with interconnected clauses. 
 
 8 substantive Indian government scheme documents (PDFs):
 
-| Document | Focus Area |
-|----------|------------|
-| PM-KISAN FAQ | Farmer income support Q&A |
+| Document                                | Focus Area                         |
+| --------------------------------------- | ---------------------------------- |
+| PM-KISAN FAQ                            | Farmer income support Q&A          |
 | Revised PM-KISAN Operational Guidelines | Eligibility, verification, payment |
-| PM Vishwakarma Guidelines | Artisan/craftsperson support |
-| PM Vishwakarma Scheme | Scheme overview |
-| PM-JAY Operational Guidelines | Health insurance (Ayushman Bharat) |
-| Pradhan Mantri Mudra Yojana | Micro-enterprise loans |
-| Stand Up India Scheme | SC/ST/Women entrepreneur loans |
-| Guidelines for PM Arogya Mitra | Health scheme facilitators |
+| PM Vishwakarma Guidelines               | Artisan/craftsperson support       |
+| PM Vishwakarma Scheme                   | Scheme overview                    |
+| PM-JAY Operational Guidelines           | Health insurance (Ayushman Bharat) |
+| Pradhan Mantri Mudra Yojana             | Micro-enterprise loans             |
+| Stand Up India Scheme                   | SC/ST/Women entrepreneur loans     |
+| Guidelines for PM Arogya Mitra          | Health scheme facilitators         |
 
 ---
 
 ## API Endpoints
 
 ### `GET /health`
+
 Health check. Returns `{"status": "ok"}`.
 
 ### `POST /ask`
+
 Ask a question and receive a grounded answer with citations.
 
 **Request:**
+
 ```json
 {
   "query": "What is the eligibility for PM-KISAN?"
@@ -108,6 +111,7 @@ Ask a question and receive a grounded answer with citations.
 ```
 
 **Response:**
+
 ```json
 {
   "answer": "The PM-KISAN scheme covers ...",
@@ -127,9 +131,11 @@ Ask a question and receive a grounded answer with citations.
 **No-hallucination guarantee:** If the documents don't cover the question, the system explicitly says _"The documents do not cover this question."_
 
 ### `POST /contradict`
+
 Check if two documents conflict on a given topic.
 
 **Request:**
+
 ```json
 {
   "document_a": "PM-KISSAN FAQ",
@@ -139,6 +145,7 @@ Check if two documents conflict on a given topic.
 ```
 
 **Response:**
+
 ```json
 {
   "document_a": "PM-KISSAN FAQ",
@@ -164,11 +171,13 @@ Supports Hindi, Marathi, Tamil, Telugu, Bengali, and any language Gemini can han
 ## Retrieval Pipeline
 
 ### Stage 1: Hybrid Retrieval
+
 - **Dense (FAISS)** — `all-MiniLM-L6-v2` embeddings, top-12 candidates
 - **Sparse (BM25)** — Keyword matching, top-12 candidates
 - **Ensemble** — Reciprocal Rank Fusion with weights `[0.6 dense, 0.4 sparse]`, `c=60`
 
 ### Stage 2: Reranking
+
 - **Cross-encoder** — `cross-encoder/ms-marco-MiniLM-L-6-v2`
 - Re-scores the ~22 hybrid candidates and returns top-4
 
@@ -176,23 +185,24 @@ Supports Hindi, Marathi, Tamil, Telugu, Bengali, and any language Gemini can han
 
 ## Tech Stack
 
-| Component | Technology |
-|-----------|-----------|
-| Vector Store | FAISS (CPU) |
-| Embeddings | `sentence-transformers/all-MiniLM-L6-v2` |
-| Reranker | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
-| LLM | Google Gemini 2.5 Flash (free tier) |
-| Sparse Retrieval | BM25 via `rank-bm25` |
-| PDF Parsing | PyMuPDF |
-| API | FastAPI + Uvicorn |
-| UI | Streamlit |
-| Language Detection | `langdetect` |
+| Component          | Technology                               |
+| ------------------ | ---------------------------------------- |
+| Vector Store       | FAISS (CPU)                              |
+| Embeddings         | `sentence-transformers/all-MiniLM-L6-v2` |
+| Reranker           | `cross-encoder/ms-marco-MiniLM-L-6-v2`   |
+| LLM                | Google Gemini 2.5 Flash (free tier)      |
+| Sparse Retrieval   | BM25 via `rank-bm25`                     |
+| PDF Parsing        | PyMuPDF                                  |
+| API                | FastAPI + Uvicorn                        |
+| UI                 | Streamlit                                |
+| Language Detection | `langdetect`                             |
 
 ---
 
 ## Setup & Run
 
 ### Prerequisites
+
 - Python 3.10+
 - A Gemini API key ([get one free](https://aistudio.google.com/app/apikey))
 
@@ -238,6 +248,7 @@ streamlit run app_streamlit.py --server.port 7860
 ```
 
 Or use the start script (Linux/Docker):
+
 ```bash
 bash start.sh
 ```
@@ -276,3 +287,15 @@ docker run -p 7860:7860 --env-file .env schemesense-ai
 ├── start.sh
 └── .env.example
 ```
+
+---
+
+## AI Use Log
+
+I used GitHub Copilot with GPT-5.4 mini while building this project. I used it as a coding assistant to speed up scaffolding, write repetitive boilerplate, shape the ingestion and retrieval pipeline, and draft the README structure. I still understood the whole project myself, chose the architecture, selected the documents, validated the chunking strategy, checked the retrieval behavior, and tested the app locally before moving to the next step.
+
+I also used Claude for planning, strategy, and advice on how to build the project cleanly. That helped me think through the build order, the tradeoffs in the retrieval pipeline, and how to present the work honestly in the README. I treated that guidance as support, not as a replacement for my own decisions.
+
+I also used AI to help me debug import issues, refine metadata extraction for messy PDFs, tune the retrieval pipeline, and quickly rewrite parts of the documentation in a clearer submission style. I reviewed every generated piece carefully and adjusted the code where needed so the final project reflects my own understanding and decisions.
+
+In short: I did use AI to build this project, but I did not treat it as a black box. I used it to move faster, while I kept control over the design, the implementation choices, and the final validation.
