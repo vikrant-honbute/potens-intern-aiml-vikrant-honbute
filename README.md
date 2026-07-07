@@ -12,6 +12,7 @@ pinned: false
 
 A Retrieval-Augmented Generation (RAG) system for Indian government scheme documents that provides grounded answers with citations and contradiction detection across documents.
 
+LIVE DEMO- https://huggingface.co/spaces/Vikrant-Honbute/schemesense-ai
 ---
 
 ## Architecture Overview
