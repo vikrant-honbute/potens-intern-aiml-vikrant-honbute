@@ -29,4 +29,5 @@ ENV/
 .tox/
 .coverage
 htmlcov/
+data/faiss_index/
 
