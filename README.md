@@ -77,7 +77,7 @@ Government scheme documents contain dense legalese with interconnected clauses. 
 
 ## Corpus
 
-9 substantive Indian government scheme documents (PDFs):
+8 substantive Indian government scheme documents (PDFs):
 
 | Document | Focus Area |
 |----------|------------|
@@ -87,7 +87,6 @@ Government scheme documents contain dense legalese with interconnected clauses. 
 | PM Vishwakarma Scheme | Scheme overview |
 | PM-JAY Operational Guidelines | Health insurance (Ayushman Bharat) |
 | Pradhan Mantri Mudra Yojana | Micro-enterprise loans |
-| Mudra Loan Salient Features | Loan product details |
 | Stand Up India Scheme | SC/ST/Women entrepreneur loans |
 | Guidelines for PM Arogya Mitra | Health scheme facilitators |
 
