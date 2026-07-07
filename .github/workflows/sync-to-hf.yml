@@ -26,4 +26,9 @@ jobs:
           git config user.email "github-actions@github.com"
           HF_USERNAME="${HF_USERNAME:-user}"
           git remote add hf https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/Vikrant-Honbute/schemesense-ai
-          git push hf main --force
+          
+          # Remove the System_Architecture directory so it is not deployed to Hugging Face
+          git rm -r --cached System_Architecture || true
+          git commit -m "Deploy to Hugging Face without System_Architecture" || true
+          
+          git push hf HEAD:main --force
