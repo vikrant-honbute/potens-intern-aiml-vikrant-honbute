@@ -6,3 +6,5 @@ DEFAULT_CORPUS_DIR = ROOT_DIR / "data" / "pdfs"
 DEFAULT_ARTIFACT_DIR = ROOT_DIR / "data" / "faiss_index"
 DEFAULT_CHUNK_SIZE = 1200
 DEFAULT_CHUNK_OVERLAP = 150
+DEFAULT_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_FAISS_INDEX_NAME = "faiss_store"
